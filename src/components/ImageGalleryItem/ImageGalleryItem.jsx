@@ -3,10 +3,10 @@ import "./style.css";
 
 export class ImageGalleryItem extends Component {
   render() {
-    const { imageUrl, altText, key } = this.props;
+    const { imageUrl, altText } = this.props;
 
     return (
-      <li key={key} className="gallery-item">
+      <li className="gallery-item">
         <img src={imageUrl} alt={altText} />
       </li>
     );
