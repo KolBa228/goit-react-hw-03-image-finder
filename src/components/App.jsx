@@ -20,10 +20,11 @@ export class App extends Component {
   };
 
   handleSearch = (query) => {
-    this.setState({ q: query, page: 1 }, () => {
-      this.fetchData();
-    });
-  };
+  this.setState({ q: query, page: 1, images: []}, () => {
+    this.fetchData();
+  });
+};
+
 
   openModal = (imageUrl) => {
     this.setState({ selectedImage: imageUrl });
@@ -66,54 +67,28 @@ export class App extends Component {
     this.fetchData();
   }
 
-//   fetchData = async () => {
-//   try {
-//     const response = await axios.get(
-//       `https://pixabay.com/api/?q=${this.state.q}&page=${this.state.page}&key=37828594-2a1dcba166f42d48673b13374&image_type=photo&orientation=horizontal&per_page=${this.state.per_page}`
-//     );
-//     const data = response.data;
-//     this.setState({
-//       images: data.hits,
-//     });
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//   } finally {
-//     this.setState({
-//       isLoading: false,
-//     });
-//   }
-// };
-
-
   render() {
     const { images, isLoading } = this.state;
+    const isLoadMoreVisible = !isLoading && images.length >= 12 && images.length % this.state.per_page === 0;
 
     return (
-      <React.Fragment>
+      <>
         <Searchbar onSubmit={this.handleSearch} />
         {isLoading ? (
-          <RotatingLines
-            strokeColor="grey"
-            strokeWidth="5"
-            animationDuration="0.75"
-            width="96"
-            visible={true}
-          />
-        ) : (
-          <ImageGallery>
-            {images.map((image) => (
-              <ImageGalleryItem
-                key={image.id}
-                imageUrl={image.webformatURL}
-                altText={image.tags}
-                onClick={() => this.openModal(image.largeImageURL)}
-              />
-            ))}
-          </ImageGallery>
-        )}
-        {this.selectedImage && (
+  <RotatingLines
+    strokeColor="grey"
+    strokeWidth="5"
+    animationDuration="0.75"
+    width="96"
+    visible={true}
+  />
+) : (
+  <ImageGallery images={images} openModal={this.openModal} />
+)};
+
+        {this.state.selectedImage && (
           <Modal
-            imageUrl={this.selectedImage}
+            imageUrl={this.state.selectedImage}
             altText="Large Image"
             onClose={this.closeModal}
           />
@@ -121,7 +96,7 @@ export class App extends Component {
         {!isLoading && images.length !== 0 && (
           <Button onSearchMore={this.onloadMore} />
         )}
-      </React.Fragment>
+      </>
     );
   }
 }
