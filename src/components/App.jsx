@@ -69,7 +69,7 @@ export class App extends Component {
 
   render() {
     const { images, isLoading } = this.state;
-    const isLoadMoreVisible = !isLoading && images.length >= 12 && images.length % this.state.per_page === 0;
+    // const isLoadMoreVisible = !isLoading && images.length >= 12 && images.length % this.state.per_page === 0;
 
     return (
       <>
