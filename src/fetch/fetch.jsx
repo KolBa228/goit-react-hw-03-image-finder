@@ -1,5 +1,4 @@
 import axios from "axios";
-
 export const fetchData = async (q, page, perPage) => {
   try {
     const response = await axios.get(

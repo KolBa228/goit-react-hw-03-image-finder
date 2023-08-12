@@ -1,111 +1,96 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { Searchbar } from "./Searchbar/Searchbar";
 import { ImageGallery } from "./ImageGallery/ImageGallery";
 import { Button } from "./Button/Button";
 import { RotatingLines } from "react-loader-spinner";
 import { fetchData } from "../fetch/fetch";
 import { Modal } from "./Modal/Modal";
+import axios from "axios";
 
-export class App extends Component {
-  state = {
-    images: [],
-    q: "",
-    page: 1,
-    per_page: 12,
-    isLoading: true,
-    isInitialLoad: true,
-    selectedImage: null,
+export const App = () => {
+
+  const [images, setImages] = useState([]);
+  const [q, setQ] = useState('');
+  const [page, setPage] = useState(1);
+  const [per_page, setPer_page] = useState(12);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [prevPage, setPrevPage] = useState(page);
+  const [prevQ, setPrevQ] = useState(q);
+
+  const handleSearch = (query) => {
+    setQ(query);
+    setPage(1);
+    setImages([]);
   };
 
-  handleSearch = (query) => {
-    this.setState({ q: query, page: 1, images: [] }, () => {
-      // this.fetchData();
-    });
-  };
-
-  handleKeyDown = (event) => {
+  const handleKeyDown = (event) => {
     if (event.keyCode === 27) {
-      this.closeModal();
+      closeModal();
     }
   };
 
-  openModal = (imageUrl) => {
-    this.setState({ selectedImage: imageUrl });
-    window.addEventListener("keydown", this.handleKeyDown);
+  const openModal = (imageUrl) => {
+    setSelectedImage(imageUrl);
+    window.addEventListener("keydown", handleKeyDown);
   };
 
-  closeModal = () => {
-    this.setState({ selectedImage: null });
-    window.removeEventListener("keydown", this.handleKeyDown);
+  const closeModal = () => {
+    setSelectedImage(null);
+    window.removeEventListener("keydown", handleKeyDown);
   };
 
-  fetchData = async () => {
-    const { q, page, per_page } = this.state;
+  const onloadMore = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
 
-    try {
-      const hits = await fetchData(q, page, per_page);
-      this.setState((prevState) => ({
-        images: [...prevState.images, ...hits],
-      }));
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      this.setState({
-        isLoading: false,
-      });
+  useEffect(() => {
+    const fetchDataAsync = async () => {
+      try {
+        const newImages = await fetchData(q, page, per_page);
+        setImages((prevImages) => [...prevImages, ...newImages]);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setIsLoading(false);
+      }
+    };
+
+    if (isInitialLoad) {
+      fetchDataAsync();
+      setIsInitialLoad(false);
+    } else if (prevPage !== page || prevQ !== q) {
+      fetchDataAsync();
+      setPrevPage(page);
+      setPrevQ(q);
     }
-  };
+  }, [isInitialLoad, prevPage, prevQ, q, page, per_page]);
 
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (prevState.page !== this.state.page) {
-  //     this.fetchData();
-  //   }
-  // }
-
-  componentDidUpdate(prevProps, prevState) {
-  if (prevState.page !== this.state.page || prevState.q !== this.state.q) {
-    this.fetchData();
-  }
-}
-
-  onloadMore = () => {
-    this.setState((prevState) => ({
-      page: prevState.page + 1,
-    }));
-  };
-
-  componentDidMount() {
-    this.fetchData();
-  }
-
-  render() {
-    const { images, isLoading } = this.state;
-
-    return (
-      <>
-        <Searchbar onSubmit={this.handleSearch} />
-        {isLoading ? (
-          <RotatingLines
-            strokeColor="grey"
-            strokeWidth="5"
-            animationDuration="0.75"
-            width="96"
-            visible={true}
-          />
-        ) : (
-          <ImageGallery images={images} openModal={this.openModal} />
-        )}
-        {this.state.selectedImage && (
-          <Modal
-            imageUrl={this.state.selectedImage}
-            altText="Large Image"
-            onClose={this.closeModal}
-          />
-        )}
-        {!isLoading && images.length !== 0 && (
-          <Button onSearchMore={this.onloadMore} />
-        )}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <Searchbar onSubmit={handleSearch} />
+      {isLoading ? (
+        <RotatingLines
+          strokeColor="grey"
+          strokeWidth="5"
+          animationDuration="0.75"
+          width="96"
+          visible={true}
+        />
+      ) : (
+        <ImageGallery images={images} openModal={openModal} />
+      )}
+      {selectedImage && (
+        <Modal
+          imageUrl={selectedImage}
+          altText="Large Image"
+          onClose={closeModal}
+        />
+      )}
+      {!isLoading && images.length !== 0 && (
+        <Button onSearchMore={onloadMore} />
+      )}
+    </>
+  );
+};
