@@ -12,7 +12,7 @@ export const App = () => {
   const [images, setImages] = useState([]);
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
-  const [per_page, setPer_page] = useState(12);
+  // const [per_page, setPer_page] = useState(12);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -65,7 +65,7 @@ export const App = () => {
       setPrevPage(page);
       setPrevQ(q);
     }
-  }, [isInitialLoad, prevPage, prevQ, q, page, per_page]);
+  }, [isInitialLoad, prevPage, prevQ, q, page,]);
 
   return (
     <>
