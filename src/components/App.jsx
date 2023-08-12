@@ -5,7 +5,7 @@ import { Button } from "./Button/Button";
 import { RotatingLines } from "react-loader-spinner";
 import { fetchData } from "../fetch/fetch";
 import { Modal } from "./Modal/Modal";
-import axios from "axios";
+// import axios from "axios";
 
 export const App = () => {
 
