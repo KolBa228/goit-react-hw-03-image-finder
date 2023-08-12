@@ -48,7 +48,7 @@ export const App = () => {
   useEffect(() => {
     const fetchDataAsync = async () => {
       try {
-        const newImages = await fetchData(q, page, per_page);
+        const newImages = await fetchData(q, page,);
         setImages((prevImages) => [...prevImages, ...newImages]);
         setIsLoading(false);
       } catch (error) {
